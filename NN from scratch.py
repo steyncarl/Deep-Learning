@@ -5,6 +5,10 @@ Created on Wed Feb 14 07:35:36 2018
 @author: Carl Steyn
 """
 import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib  import cm
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn.datasets.samples_generator import make_blobs
 
 class NeuralNet(object):
     def __init__(self):
@@ -42,17 +46,39 @@ class NeuralNet(object):
 
     def train(self,x,y):
         yh = self.forward(X)
-        scalar = 2
+        scalar = 0.5
         cost = 10
-        while cost>0.001:
+        count = 0
+        while cost>0.5:
+        #while count < 5000:
+            count += 1
             dJdW1 , dJdW2 = self.costfuncprime(x,y)
             self.W1 = self.W1 - scalar*dJdW1
             self.W2 = self.W2 - scalar*dJdW2
             yh = self.forward(x)
-            cost
+            cost = self.costfunc(x,y)
         return yh , cost
-#%%    
+    
+# import data with 2 distinct clusters
+X, y = make_blobs(n_samples=25, centers=2, n_features=2,random_state=0)
+X = X/np.amax(X, axis=0) # standardize X
+cl = y # color code for plot
+y = y.reshape(-1,1)
+
+# plot data
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.scatter(X[:,0], X[:,1], y,c=cl,cmap = cm.seismic)
+plt.show()
+
+# declare NN object and train it
 NN = NeuralNet()
-X = np.random.randint(0,10,(4,2))
-y = np.random.uniform(size=(4,1))
 yh , cost = NN.train(X,y)
+
+# plot predictions
+cl = yh
+cl.shape = (25,)
+fig2 = plt.figure()
+ax = Axes3D(fig2)
+ax.scatter(X[:,0], X[:,1], yh,c=cl,cmap = cm.seismic )
+plt.show()
